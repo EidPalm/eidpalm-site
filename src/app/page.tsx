@@ -1,7 +1,15 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, type Variants } from "framer-motion";
 import { ArrowRight, Sparkles, Globe, ShoppingCart, Languages, Leaf } from "lucide-react";
+const wordVariants: Variants = {
+  hidden: { opacity: 0, y: 16 },
+  show: (i: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.06, duration: 0.45, ease: "easeOut" },
+  }),
+};
 
 /**
  * Eid Palm — Ragged Edge–style Landing (v0.1)
@@ -74,15 +82,6 @@ function Grain() {
     />
   );
 }
-
-const wordVariants = {
-  hidden: { y: "100%", opacity: 0 },
-  show: (i: number) => ({
-    y: "0%",
-    opacity: 1,
-    transition: { delay: i * 0.07, duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-  }),
-};
 
 function KineticHeadline({ text }: { text: string }) {
   const words = text.split(" ");
