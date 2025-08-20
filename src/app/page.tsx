@@ -4,9 +4,9 @@ import { motion, useScroll, useTransform, type Variants } from "framer-motion";
 import { ArrowRight, Sparkles, Globe, ShoppingCart, Languages, Leaf } from "lucide-react";
 const wordVariants: Variants = {
   hidden: { opacity: 0, y: 16 },
-  show: (i: number = 0) => ({
-    opacity: 1,
+  show: (i: number) => ({
     y: 0,
+    opacity: 1,
     transition: { delay: i * 0.06, duration: 0.45, ease: "easeOut" },
   }),
 };
