@@ -1,0 +1,3 @@
+src\app\page.tsx:227:              key="/legend-teaser.mp4"
+src\app\page.tsx:229:              src="/legend-teaser.mp4"
+src\app\page.tsx:230:              poster="/legend-teaser-fallback.jpg"

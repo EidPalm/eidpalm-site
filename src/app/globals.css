@@ -1,4 +1,7 @@
 @import "tailwindcss";
+@layer utilities {
+  .container { margin-inline: auto; padding-inline: 1rem; max-width: 1200px; }
+}
 
 :root {
   --background: #ffffff;

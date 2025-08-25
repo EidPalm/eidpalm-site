@@ -1,15 +1,44 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform, type Variants } from "framer-motion";
-import { ArrowRight, Sparkles, Globe, ShoppingCart, Languages, Leaf } from "lucide-react";
+import { motion, type Variants } from "framer-motion";
+import { ArrowRight, Sparkles, Globe, ShoppingCart, Languages } from "lucide-react";
+import Marquee from "../components/Marquee";
+import VideoCard from "../components/VideoCard";
+
+/* === Section wrapper for consistent layout === */
+const Section = ({
+  id,
+  className = "",
+  children,
+}: {
+  id?: string;
+  className?: string;
+  children: React.ReactNode;
+}) => (
+  <section id={id} className={`mx-auto max-w-screen-xl px-4 sm:px-6 md:px-8 ${className}`}>
+    {children}
+  </section>
+);
+
+/* === Motion variants === */
 const wordVariants: Variants = {
   hidden: { opacity: 0, y: 16 },
   show: (i: number) => ({
-    y: 0,
     opacity: 1,
+    y: 0,
     transition: { delay: i * 0.06, duration: 0.45, ease: "easeOut" },
   }),
 };
+
+/* === VideoCard typing (avoid `any`) === */
+type VideoCardProps = {
+  src: string;
+  poster?: string;
+  title?: string;
+  caption?: string;
+  className?: string;
+};
+const VCard = VideoCard as React.ComponentType<VideoCardProps>;
 
 /**
  * Eid Palm — Ragged Edge–style Landing (v0.1)
@@ -112,10 +141,11 @@ function Header() {
         scrolled ? "backdrop-blur-md bg-neutral-900/60 border-b border-white/10" : "bg-transparent"
       }`}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
-        <a href="#top" className="flex items-center gap-2 font-semibold tracking-tight text-white">
-          <Leaf className="h-5 w-5 text-amber-400" />
-          <span>Eid Palm</span>
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3"><a href="/" className="flex items-center gap-2 font-semibold tracking-tight text-white">
+  <img src="/eidpalm-logo.svg" alt="Eid Palm" className="h-7 w-auto drop-shadow-[0_1px_1.5px_rgba(0,0,0,.7)]" />
+  <span className="sr-only">Eid Palm</span>
+</a>
+
         </a>
         <nav className="hidden items-center gap-6 md:flex">
           {navItems.map((n) => (
@@ -137,110 +167,39 @@ function Header() {
   );
 }
 
-function Hero() {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], [0, 80]);
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.05]);
-
-  return (
-    <section id="top" ref={ref} className="relative min-h-[92vh] w-full overflow-hidden bg-neutral-950 text-white">
-      <motion.div style={{ y, scale }} className="absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(60%_80%_at_70%_20%,rgba(250,204,21,0.25),transparent_60%),radial-gradient(40%_60%_at_20%_80%,rgba(255,255,255,0.06),transparent_60%)]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
-      </motion.div>
-
-      <div className="relative z-10 mx-auto flex min-h-[92vh] max-w-7xl flex-col items-start justify-center gap-6 px-4">
-        <span className="inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1 text-xs text-white/70 backdrop-blur-sm">
-          <Sparkles className="h-3.5 w-3.5" />
-          Introducing the Eid Palm
-        </span>
-        <KineticHeadline text="Reimagine Eid. Make it unforgettable." />
-        <p className="max-w-2xl text-pretty text-base text-white/80 md:text-lg">
-          A centerpiece for modern celebrations — a 1.8 m artificial palm with light-filled calligraphy cutouts and
-          customizable <em>Zena</em> accessories. Designed for homes, majlis, and public spaces.
-        </p>
-        <div className="flex flex-wrap items-center gap-3">
-          <MagneticCTA href="#preorder">Preorder now</MagneticCTA>
-          <a href="#showcase" className="group inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-white/80 ring-1 ring-white/10 hover:text-white">
-            Watch teaser <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-0.5" />
-          </a>
-        </div>
-      </div>
-
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-24 bg-gradient-to-t from-black/60 to-transparent" />
-    </section>
-  );
-}
+/* === Show real hover video tiles using <VideoCard> === */
+type Tile = { src: string; title: string; caption: string };
 
 function Showcase() {
-  const items = [
-    {
-      title: "Zena Collection",
-      metric: "100+",
-      caption: "handcrafted ornaments",
-      body: "Curate your tree with iconic Islamic & Arabian motifs. Gold-finish, balanced weight, nearly invisible threads.",
-    },
-    {
-      title: "PalmMena App",
-      metric: "1",
-      caption: "tap to change lights",
-      body: "Switch light scenes, schedule evenings, and unlock stories behind each Zena via QR — all in one app.",
-    },
-    {
-      title: "Sizes & Builds",
-      metric: "1.8 m",
-      caption: "standard height",
-      body: "Standard for homes; custom builds for hotels & malls. Safe, durable materials with a warm interior glow.",
-    },
-    {
-      title: "Education Mode",
-      metric: "200+",
-      caption: "micro-lessons",
-      body: "Each ornament can teach — geography, food, architecture — through bite-sized AR-ready stories.",
-    },
+  const tiles: Tile[] = [
+    { src: "/tile-1.mp4", title: "Zena Collection", caption: "Hover or tap to play" },
+    { src: "/tile-2.mp4", title: "PalmMena App", caption: "Hover or tap to play" },
+    { src: "/tile-3.mp4", title: "Sizes & Builds", caption: "Hover or tap to play" },
   ];
 
   return (
-    <section id="showcase" className="relative bg-neutral-950 py-20 text-white">
-      <div className="mx-auto max-w-7xl px-4">
-        <div className="mb-8 flex items-end justify-between">
-          <h2 className="text-3xl font-bold md:text-5xl">Showcase</h2>
-          <span className="text-sm text-white/60">Swipe / scroll →</span>
-        </div>
+    <Section id="showcase" className="relative bg-neutral-950 py-20 text-white">
+      <div className="mb-8 flex items-end justify-between">
+        <h2 className="text-3xl font-bold md:text-5xl">Showcase</h2>
+        <span className="text-sm text-white/60">Hover or tap to play</span>
       </div>
 
-      <div className="no-scrollbar relative mx-auto max-w-[96vw] overflow-x-auto px-4">
-        <ul className="flex snap-x snap-mandatory gap-4">
-          {items.map((it, i) => (
-            <li
-              key={i}
-              className="group relative aspect-[16/10] w-[86vw] max-w-3xl shrink-0 snap-start overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-neutral-900 to-neutral-800 p-6 md:w-[62vw]"
-            >
-              <div className="absolute inset-0 opacity-60 [background:radial-gradient(70%_60%_at_80%_30%,rgba(250,204,21,0.16),transparent_70%),radial-gradient(40%_50%_at_10%_80%,rgba(255,255,255,0.08),transparent_60%)]" />
-              <div className="relative z-10 flex h-full flex-col justify-between">
-                <div>
-                  <h3 className="text-2xl font-semibold md:text-3xl">{it.title}</h3>
-                  <p className="mt-2 max-w-md text-sm text-white/70">{it.body}</p>
-                </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-extrabold text-amber-400 md:text-6xl">{it.metric}</span>
-                  <span className="text-sm uppercase tracking-wider text-white/70">{it.caption}</span>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        {tiles.map((t, i) => (
+          <VCard key={i} src={t.src} title={t.title} caption={t.caption} className="aspect-[16/10]" />
+        ))}
       </div>
-    </section>
+    </Section>
   );
 }
 
 function Story() {
   return (
-    <section id="story" className="relative overflow-hidden bg-neutral-950 py-28 text-white">
+    <Section id="story" className="relative overflow-hidden bg-neutral-950 py-28 text-white">
+      {/* soft radial accent */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_60%_at_30%_30%,rgba(250,204,21,0.12),transparent_60%)]" />
-      <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 md:grid-cols-12 md:items-center">
+
+      <div className="relative z-10 grid grid-cols-1 gap-10 md:grid-cols-12 md:items-center">
         <motion.div
           className="md:col-span-6"
           initial={{ opacity: 0, y: 30 }}
@@ -255,6 +214,7 @@ function Story() {
             space. It’s the centerpiece where families gather, stories glow, and traditions evolve.
           </p>
         </motion.div>
+
         <motion.div
           className="md:col-span-6"
           initial={{ opacity: 0, y: 30 }}
@@ -262,14 +222,25 @@ function Story() {
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="aspect-[4/3] w-full overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-neutral-900 to-neutral-800">
-            <div className="flex h-full items-center justify-center p-8 text-center text-white/70">
-              (Video teaser placeholder)
-            </div>
+          {/* Story teaser video (right column) */}
+          <div className="relative aspect-video w-full overflow-hidden rounded-3xl border border-white/10 bg-neutral-900/60 shadow-lg">
+            <video
+              key="/legend-teaser-v2.mp4"
+              className="h-full w-full object-cover"
+              src="/legend-teaser-v2.mp4"
+              poster="/legend-teaser-fallback.jpg"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              aria-label="Eid Palm story teaser"
+            />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-black/30 via-transparent to-black/20 ring-1 ring-white/10" />
           </div>
         </motion.div>
       </div>
-    </section>
+    </Section>
   );
 }
 
@@ -280,59 +251,130 @@ function Features() {
     { icon: <Languages className="h-5 w-5" />, title: "Arabic + English", text: "Switchable content and RTL-friendly layout." },
     { icon: <ShoppingCart className="h-5 w-5" />, title: "Preorder", text: "Secure your tree and Zena sets ahead of Eid." },
   ];
+
   return (
-    <section id="features" className="bg-neutral-950 py-24 text-white">
-      <div className="mx-auto max-w-7xl px-4">
-        <h2 className="text-3xl font-bold md:text-5xl">Design that celebrates</h2>
-        <p className="mt-3 max-w-2xl text-white/70">
-          Elegant by day, radiant by night. Engineered with safe materials and a timeless silhouette. Make Eid the
-          center of your space — beautifully.
-        </p>
-        <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-4">
-          {feats.map((f, i) => (
-            <motion.div
-              key={i}
-              className="rounded-3xl border border-white/10 bg-gradient-to-br from-neutral-900 to-neutral-800 p-6"
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ delay: i * 0.05, duration: 0.5 }}
-            >
-              <div className="mb-3 text-amber-400">{f.icon}</div>
-              <h3 className="font-semibold">{f.title}</h3>
-              <p className="mt-1 text-sm text-white/70">{f.text}</p>
-            </motion.div>
-          ))}
-        </div>
+    <Section id="features" className="bg-neutral-950 py-24 text-white">
+      <h2 className="text-3xl font-bold md:text-5xl">Design that celebrates</h2>
+      <p className="mt-3 max-w-2xl text-white/70">
+        Elegant by day, radiant by night. Engineered with safe materials and a timeless silhouette. Make Eid the
+        center of your space — beautifully.
+      </p>
+
+      <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-4">
+        {feats.map((f, i) => (
+          <motion.div
+            key={i}
+            className="rounded-3xl border border-white/10 bg-gradient-to-br from-neutral-900 to-neutral-800 p-6"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ delay: i * 0.05, duration: 0.5 }}
+          >
+            <div className="mb-3 text-amber-400">{f.icon}</div>
+            <h3 className="font-semibold">{f.title}</h3>
+            <p className="mt-1 text-sm text-white/70">{f.text}</p>
+          </motion.div>
+        ))}
       </div>
-    </section>
+    </Section>
   );
 }
 
 function Preorder() {
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const FORM_ENDPOINT = "https://formspree.io/f/movnalpw"; // TODO: move to NEXT_PUBLIC_FORMSPREE_ENDPOINT
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setStatus("loading");
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    data.append("_subject", "Eid Palm Preorder");
+
+    try {
+      const res = await fetch(FORM_ENDPOINT, {
+        method: "POST",
+        body: data,
+        headers: { Accept: "application/json" },
+      });
+      if (res.ok) {
+        setStatus("success");
+        form.reset();
+      } else {
+        setStatus("error");
+      }
+    } catch {
+      setStatus("error");
+    }
+  }
+
   return (
-    <section id="preorder" className="relative overflow-hidden bg-white py-24 text-neutral-900">
-      <div className="absolute inset-0 -z-0 bg-[radial-gradient(60%_60%_at_60%_40%,rgba(245,158,11,0.15),transparent_60%)]" />
-      <div className="relative z-10 mx-auto max-w-6xl px-4">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:items-center">
-          <div className="md:col-span-7">
-            <h2 className="text-3xl font-bold md:text-5xl">Preorder Eid Palm</h2>
-            <p className="mt-3 max-w-prose text-neutral-700">
-              Be among the first to welcome the Eid Palm into your home. Limited early batch with special Zena set.
-            </p>
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              <MagneticCTA href="#contact">Reserve yours</MagneticCTA>
-              <a href="#features" className="rounded-2xl px-5 py-3 text-neutral-700 ring-1 ring-neutral-300 hover:bg-neutral-50">
-                Learn more
-              </a>
+    <Section id="preorder" className="relative overflow-hidden bg-white py-24 text-neutral-900">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_60%_at_60%_40%,rgba(245,158,11,0.15),transparent_60%)]" />
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:items-center">
+        <div className="md:col-span-7">
+          <h2 className="text-3xl font-bold md:text-5xl">Preorder Eid Palm</h2>
+          <p className="mt-3 max-w-prose text-neutral-700">
+            Be among the first to welcome the Eid Palm into your home. Limited early batch with special Zena set.
+          </p>
+
+          {/* The actual form */}
+          <form onSubmit={handleSubmit} className="mt-6 grid gap-3 sm:grid-cols-2 max-w-lg" noValidate>
+            <input
+              name="name"
+              placeholder="Full name"
+              required
+              autoComplete="name"
+              className="rounded-xl bg-neutral-100 text-neutral-900 placeholder-neutral-500 px-4 py-3 outline-none border border-neutral-200"
+            />
+            <input
+              name="email"
+              type="email"
+              placeholder="Email address"
+              required
+              autoComplete="email"
+              className="rounded-xl bg-neutral-100 text-neutral-900 placeholder-neutral-500 px-4 py-3 outline-none border border-neutral-200"
+            />
+            {/* Honeypot */}
+            <input type="text" name="_gotcha" className="hidden" tabIndex={-1} autoComplete="off" />
+
+            <button
+              type="submit"
+              disabled={status === "loading"}
+              aria-busy={status === "loading"}
+              className="sm:col-span-2 rounded-xl px-5 py-3 font-medium bg-emerald-500 hover:bg-emerald-600 text-white disabled:opacity-60"
+            >
+              {status === "loading" ? "Sending..." : "Reserve my spot"}
+            </button>
+
+            {/* SR-friendly live region for form status */}
+            <div aria-live="polite" aria-atomic="true" className="sm:col-span-2 min-h-[1.25rem]">
+              {status === "success" && (
+                <p className="text-xs text-emerald-600">Thanks! We’ll email you when preorders open.</p>
+              )}
+              {status === "error" && (
+                <p className="text-xs text-red-600">Sorry—something went wrong. Please try again.</p>
+              )}
             </div>
-          </div>
-          <div className="md:col-span-5">
-            <div className="aspect-[4/3] w-full rounded-3xl border border-neutral-200 bg-gradient-to-br from-neutral-100 to-neutral-200" />
-          </div>
+
+            <p className="text-xs text-neutral-500 sm:col-span-2">
+              We’ll only use your email to notify you about preorder availability.
+            </p>
+          </form>
+
+          <a
+            href="#features"
+            className="mt-4 inline-block rounded-2xl px-5 py-3 text-neutral-700 ring-1 ring-neutral-300 hover:bg-neutral-50"
+          >
+            Learn more
+          </a>
+        </div>
+
+        <div className="md:col-span-5">
+          <div className="aspect-[4/3] w-full rounded-3xl border border-neutral-200 bg-gradient-to-br from-neutral-100 to-neutral-200" />
         </div>
       </div>
-    </section>
+    </Section>
   );
 }
 
@@ -352,13 +394,13 @@ function Footer() {
             <h4 className="mb-2 font-semibold">Get in touch</h4>
             <ul className="space-y-1 text-white/80">
               <li>
-                <a className="hover:text-white" href="mailto:hello@eidpalm.com">
-                  hello@eidpalm.com
+                <a className="hover:text-white" href="mailto:halla@eidpalm.com">
+                  halla@eidpalm.com
                 </a>
               </li>
               <li>
-                <a className="hover:text-white" href="tel:+971000000000">
-                  +971 00 000 0000
+                <a className="hover:text-white" href="tel:+971555166112">
+                  +971 55 516 6112
                 </a>
               </li>
             </ul>
@@ -405,12 +447,67 @@ export default function EidPalmLanding() {
     <main className="bg-neutral-950 text-white selection:bg-amber-300/40 selection:text-white">
       <Grain />
       <Header />
-      <Hero />
+
+      {/* === HERO (teaser-v2 video + text overlay) === */}
+      <section
+        id="hero"
+        className="relative isolate aspect-[16/9] w-full overflow-hidden edge-slant-bottom"
+        aria-label="Eid Palm Hero"
+      >
+        {/* Video background */}
+        <video
+          className="absolute inset-0 h-full w-full object-cover z-0"
+          src="/teaser-v2.mp4"
+          poster="/teaser-fallback.jpg"
+          autoPlay
+          muted
+          loop
+          playsInline
+        />
+        {/* Readability gradient over video */}
+        <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-tr from-black/70 via-black/25 to-transparent" />
+        {/* Text overlay */}
+        <div className="relative z-20 mx-auto max-w-screen-xl px-4 sm:px-6 md:px-8 py-12 sm:py-20">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold leading-tight tracking-tight">
+            Unforgettable Moments &amp; More
+          </h1>
+        </div>
+      </section>
+
+      {/* === MARQUEE === */}
+<Marquee
+  items={[
+    "Celebrate",
+    "Heritage",
+    "Modern",
+    "Togetherness",
+    "Elegant",
+    "Play",
+    "Educational",
+    "Roots",
+    "Interactive",
+    "Joyful",
+    "Community",
+    "Modular",
+    "Colorful",
+    "Secure",
+    "Traditional",
+    "Personalized",
+    "Ambient",
+    "Pride",
+    "Interchangeable",
+    "Legacy",
+    "Fun",
+    "Sustainable",
+  ]}
+/>
+
       <Story />
       <Showcase />
       <Features />
       <Preorder />
       <Footer />
+
       <style>{`
         .no-scrollbar::-webkit-scrollbar{display:none}
         .no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
@@ -418,4 +515,3 @@ export default function EidPalmLanding() {
     </main>
   );
 }
-
