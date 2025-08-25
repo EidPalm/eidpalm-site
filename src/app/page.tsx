@@ -141,12 +141,17 @@ function Header() {
         scrolled ? "backdrop-blur-md bg-neutral-900/60 border-b border-white/10" : "bg-transparent"
       }`}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3"><a href="/" className="flex items-center gap-2 font-semibold tracking-tight text-white">
-  <img src="/eidpalm-logo.svg" alt="Eid Palm" className="h-7 w-auto drop-shadow-[0_1px_1.5px_rgba(0,0,0,.7)]" />
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
+        {/* Brand (logo only) */}
+<a href="/" className="flex items-center gap-2 font-semibold tracking-tight text-white">
+  <img
+    src="/eidpalm-logo-v2.svg"
+    alt="Eid Palm"
+    className="h-8 md:h-10 w-auto drop-shadow-[0_1px_1.5px_rgba(0,0,0,.7)]"
+  />
   <span className="sr-only">Eid Palm</span>
 </a>
 
-        </a>
         <nav className="hidden items-center gap-6 md:flex">
           {navItems.map((n) => (
             <a key={n.href} href={n.href} className="text-sm text-white/80 hover:text-white transition-colors">
@@ -157,6 +162,7 @@ function Header() {
             Preorder
           </a>
         </nav>
+
         <div className="flex items-center gap-2">
           <button aria-label="Language" className="rounded-xl p-2 text-white/70 hover:text-white">
             <Languages className="h-5 w-5" />
@@ -385,8 +391,8 @@ function Footer() {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           <div>
             <div className="flex items-center gap-2 font-semibold">
-              <Leaf className="h-5 w-5 text-amber-400" />
-              Eid Palm
+              <img src="/eidpalm-logo-v2.svg" alt="Eid Palm" className="h-5 w-auto" />
+              <span>Eid Palm</span>
             </div>
             <p className="mt-3 max-w-sm text-white/70">Culture Element LLC · UAE & GCC</p>
           </div>
@@ -475,32 +481,32 @@ export default function EidPalmLanding() {
       </section>
 
       {/* === MARQUEE === */}
-<Marquee
-  items={[
-    "Celebrate",
-    "Heritage",
-    "Modern",
-    "Togetherness",
-    "Elegant",
-    "Play",
-    "Educational",
-    "Roots",
-    "Interactive",
-    "Joyful",
-    "Community",
-    "Modular",
-    "Colorful",
-    "Secure",
-    "Traditional",
-    "Personalized",
-    "Ambient",
-    "Pride",
-    "Interchangeable",
-    "Legacy",
-    "Fun",
-    "Sustainable",
-  ]}
-/>
+      <Marquee
+        items={[
+          "Celebrate",
+          "Heritage",
+          "Modern",
+          "Togetherness",
+          "Elegant",
+          "Play",
+          "Educational",
+          "Roots",
+          "Interactive",
+          "Joyful",
+          "Community",
+          "Modular",
+          "Colorful",
+          "Secure",
+          "Traditional",
+          "Personalized",
+          "Ambient",
+          "Pride",
+          "Interchangeable",
+          "Legacy",
+          "Fun",
+          "Sustainable",
+        ]}
+      />
 
       <Story />
       <Showcase />
