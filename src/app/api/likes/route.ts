@@ -1,29 +1,37 @@
+// src/app/api/likes/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { getLikes, incrementLike } from "../../../lib/likes";
+import { getLikes, incrementLike, isKVConfigured } from "../../../lib/likes";
 
-const cors = {
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
-export function OPTIONS() {
-  return new Response(null, { headers: cors });
-}
-
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const idsParam = (searchParams.get("ids") || "").trim();
-  const ids = idsParam.split(",").map((s) => s.trim()).filter(Boolean);
+  const ids = (searchParams.get("ids") || "")
+    .split(",")
+    .map(s => s.trim())
+    .filter(Boolean);
+
   const data = await getLikes(ids);
-  return NextResponse.json(data, { headers: cors });
+  if (searchParams.get("debug")) (data as any)._kv = isKVConfigured;
+  return NextResponse.json(data, { headers: CORS });
 }
 
 export async function POST(req: NextRequest) {
-  const body = await req.json().catch(() => null);
-  const id = body?.id as string | undefined;
-  if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400, headers: cors });
+  const { id } = await req.json().catch(() => ({}));
+  if (!id) {
+    return NextResponse.json({ error: "id required" }, { status: 400, headers: CORS });
+  }
+  const n = await incrementLike(String(id));
+  return NextResponse.json({ id, likes: n }, { headers: CORS });
+}
 
-  const count = await incrementLike(id);
-  return NextResponse.json({ id, count }, { headers: cors });
+export function OPTIONS() {
+  return new NextResponse(null, { headers: CORS });
 }
