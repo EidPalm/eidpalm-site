@@ -1,26 +1,37 @@
 "use client";
+
 import React, { useEffect, useRef, useState } from "react";
 import { motion, type Variants } from "framer-motion";
-import { ArrowRight, Sparkles, Globe, ShoppingCart, Languages } from "lucide-react";
+import {
+  Sparkles,
+  Globe,
+  ShoppingCart,
+  Languages,
+  Instagram,
+  Linkedin,
+  Facebook,
+  Twitter
+} from "lucide-react";
 import Marquee from "../components/Marquee";
 import VideoCard from "../components/VideoCard";
+import DesignVotes from "../components/DesignVotes";
+
 
 /* === Section wrapper for consistent layout === */
-const Section = ({
-  id,
-  className = "",
-  children,
-}: {
+type SectionProps = React.HTMLAttributes<HTMLElement> & {
   id?: string;
   className?: string;
   children: React.ReactNode;
-}) => (
-  <section id={id} className={`mx-auto max-w-screen-xl px-4 sm:px-6 md:px-8 ${className}`}>
+};
+
+const Section = ({ id, className = "", children, ...rest }: SectionProps) => (
+  <section id={id} className={`mx-auto max-w-screen-xl px-4 sm:px-6 md:px-8 ${className}`} {...rest}>
     {children}
   </section>
 );
 
-/* === Motion variants === */
+
+/* === Motion variants (kept for possible future use) === */
 const wordVariants: Variants = {
   hidden: { opacity: 0, y: 16 },
   show: (i: number) => ({
@@ -30,7 +41,7 @@ const wordVariants: Variants = {
   }),
 };
 
-/* === VideoCard typing (avoid `any`) === */
+/* === VideoCard typing === */
 type VideoCardProps = {
   src: string;
   poster?: string;
@@ -39,12 +50,6 @@ type VideoCardProps = {
   className?: string;
 };
 const VCard = VideoCard as React.ComponentType<VideoCardProps>;
-
-/**
- * Eid Palm — Ragged Edge–style Landing (v0.1)
- * Built for Next.js App Router + Tailwind + Framer Motion.
- * Sections: Header, Hero, Story, Showcase, Features, Preorder, Footer
- */
 
 const navItems = [
   { label: "Story", href: "#story" },
@@ -65,39 +70,7 @@ function useHeaderActive() {
   return scrolled;
 }
 
-function MagneticCTA({ children, href = "#preorder" }: { children: React.ReactNode; href?: string }) {
-  const ref = useRef<HTMLButtonElement | null>(null);
-  const [pos, setPos] = useState({ x: 0, y: 0 });
-
-  return (
-    <a href={href} className="inline-block">
-      <motion.button
-        ref={ref}
-        className="group relative overflow-hidden rounded-2xl px-6 py-3 font-semibold tracking-wide shadow-sm ring-1 ring-white/10 backdrop-blur-md bg-gradient-to-br from-amber-400/80 to-yellow-600/80 text-black hover:shadow-lg"
-        onMouseMove={(e) => {
-          const rect = ref.current?.getBoundingClientRect();
-          if (!rect) return;
-          const x = e.clientX - (rect.left + rect.width / 2);
-          const y = e.clientY - (rect.top + rect.height / 2);
-          setPos({ x, y });
-        }}
-        onMouseLeave={() => setPos({ x: 0, y: 0 })}
-        animate={{ x: pos.x * 0.06, y: pos.y * 0.06 }}
-        transition={{ type: "spring", stiffness: 120, damping: 10 }}
-      >
-        <span className="relative z-10 flex items-center gap-2">
-          {children} <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-0.5" />
-        </span>
-        <motion.span
-          className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent"
-          animate={{ x: ["-100%", "100%"] }}
-          transition={{ repeat: Infinity, duration: 2.8, ease: "linear" }}
-        />
-      </motion.button>
-    </a>
-  );
-}
-
+/* === Subtle grain overlay === */
 function Grain() {
   return (
     <div
@@ -112,59 +85,51 @@ function Grain() {
   );
 }
 
-function KineticHeadline({ text }: { text: string }) {
-  const words = text.split(" ");
-  return (
-    <h1 className="leading-[0.95] font-extrabold tracking-tight text-balance">
-      {words.map((w, i) => (
-        <span key={i} className="inline-block overflow-hidden align-top">
-          <motion.span
-            custom={i}
-            variants={wordVariants}
-            initial="hidden"
-            animate="show"
-            className="inline-block mr-3 text-4xl sm:text-6xl md:text-7xl lg:text-8xl"
-          >
-            {w}
-          </motion.span>
-        </span>
-      ))}
-    </h1>
-  );
-}
-
+/* === Header === */
 function Header() {
   const scrolled = useHeaderActive();
   return (
     <header
       className={`fixed inset-x-0 top-0 z-40 transition-all ${
-        scrolled ? "backdrop-blur-md bg-neutral-900/60 border-b border-white/10" : "bg-transparent"
+        scrolled
+          ? "backdrop-blur-md bg-[color:rgba(11,21,18,0.60)] border-b border-[var(--border)]"
+          : "bg-transparent"
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
         {/* Brand (logo only) */}
-<a href="/" className="flex items-center gap-2 font-semibold tracking-tight text-white">
-  <img
-    src="/eidpalm-logo-v2.svg"
-    alt="Eid Palm"
-    className="h-8 md:h-10 w-auto drop-shadow-[0_1px_1.5px_rgba(0,0,0,.7)]"
-  />
-  <span className="sr-only">Eid Palm</span>
-</a>
+        <a href="/" className="flex items-center gap-2 font-semibold tracking-tight text-[var(--foreground)]">
+          <img
+            src="/eidpalm-logo-v2.svg"
+            alt="Eid Palm"
+            className="h-10 md:h-12 w-auto drop-shadow-[0_1px_1.5px_rgba(0,0,0,.7)]"
+          />
+          <span className="sr-only">Eid Palm</span>
+        </a>
 
-        <nav className="hidden items-center gap-6 md:flex">
+        {/* Primary nav */}
+        <nav aria-label="Primary" className="hidden items-center gap-6 md:flex">
           {navItems.map((n) => (
-            <a key={n.href} href={n.href} className="text-sm text-white/80 hover:text-white transition-colors">
+            <a
+              key={n.href}
+              href={n.href}
+              className={
+                n.href === "#preorder"
+                  ? "text-sm font-medium text-[var(--accent-gold)] hover:text-[var(--foreground)] transition-colors"
+                  : "text-sm text-[var(--muted-fg)] hover:text-[var(--foreground)] transition-colors"
+              }
+            >
               {n.label}
             </a>
           ))}
-          <a href="#preorder" className="text-sm font-medium text-amber-400 hover:text-amber-300">
-            Preorder
-          </a>
         </nav>
 
         <div className="flex items-center gap-2">
-          <button aria-label="Language" className="rounded-xl p-2 text-white/70 hover:text-white">
+          <button
+            aria-label="Language"
+            className="rounded-xl p-2 text-[var(--muted-fg)] hover:text-[var(--foreground)]"
+            title="Language"
+          >
             <Languages className="h-5 w-5" />
           </button>
         </div>
@@ -173,7 +138,64 @@ function Header() {
   );
 }
 
-/* === Show real hover video tiles using <VideoCard> === */
+/* === Lightbox modal (for Showcase) === */
+function Lightbox({
+  open,
+  onClose,
+  src,
+  title,
+}: {
+  open: boolean;
+  onClose: () => void;
+  src: string;
+  title: string;
+}) {
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  if (!open) return null;
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${title} video`}
+      className="fixed inset-0 z-50 flex items-center justify-center"
+    >
+      {/* backdrop */}
+      <button
+        aria-label="Close"
+        className="absolute inset-0 bg-black/70"
+        onClick={onClose}
+      />
+      {/* content */}
+      <div className="relative mx-4 w-full max-w-5xl">
+        <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-black shadow-2xl">
+          <video
+            key={src}
+            className="h-full w-full"
+            src={src}
+            autoPlay
+            muted
+            controls
+            playsInline
+          />
+        </div>
+        <button
+          onClick={onClose}
+          className="absolute -right-2 -top-2 rounded-full bg-white/90 px-3 py-1 text-sm font-medium text-black ring-1 ring-[var(--ring)] hover:bg-white"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* === Showcase tiles === */
 type Tile = { src: string; title: string; caption: string };
 
 function Showcase() {
@@ -183,27 +205,53 @@ function Showcase() {
     { src: "/tile-3.mp4", title: "Sizes & Builds", caption: "Hover or tap to play" },
   ];
 
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState<Tile | null>(null);
+
+  function openModal(t: Tile) {
+    setActive(t);
+    setOpen(true);
+  }
+
   return (
-    <Section id="showcase" className="relative bg-neutral-950 py-20 text-white">
+    <Section id="showcase" className="relative bg-[var(--background)] py-20 text-[var(--foreground)]">
       <div className="mb-8 flex items-end justify-between">
         <h2 className="text-3xl font-bold md:text-5xl">Showcase</h2>
-        <span className="text-sm text-white/60">Hover or tap to play</span>
+        <span className="text-sm text-[var(--muted-fg)]">Click a tile to view</span>
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {tiles.map((t, i) => (
-          <VCard key={i} src={t.src} title={t.title} caption={t.caption} className="aspect-[16/10]" />
+          <button
+            key={i}
+            onClick={() => openModal(t)}
+            className="group relative aspect-[16/10] w-full overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--surface)] text-left"
+            aria-label={`Open ${t.title} video`}
+          >
+            <VCard src={t.src} title={t.title} caption={t.caption} className="pointer-events-none h-full w-full" />
+            <div className="pointer-events-none absolute inset-0 ring-0 transition-all group-hover:ring-2 group-hover:ring-[var(--accent-gold)]/60" />
+            <div className="pointer-events-none absolute bottom-3 left-3 rounded-lg bg-black/40 px-2 py-1 text-xs text-white">
+              {t.title}
+            </div>
+          </button>
         ))}
       </div>
+
+      <Lightbox
+        open={open && !!active}
+        onClose={() => setOpen(false)}
+        src={active?.src ?? ""}
+        title={active?.title ?? "Showcase"}
+      />
     </Section>
   );
 }
 
+/* === Story === */
 function Story() {
   return (
-    <Section id="story" className="relative overflow-hidden bg-neutral-950 py-28 text-white">
-      {/* soft radial accent */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_60%_at_30%_30%,rgba(250,204,21,0.12),transparent_60%)]" />
+    <Section id="story" className="relative overflow-hidden bg-[var(--background)] py-28 text-[var(--foreground)]">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_60%_at_30%_30%,rgba(245,158,11,0.12),transparent_60%)]" />
 
       <div className="relative z-10 grid grid-cols-1 gap-10 md:grid-cols-12 md:items-center">
         <motion.div
@@ -213,9 +261,9 @@ function Story() {
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
-          <p className="text-sm uppercase tracking-wider text-amber-400">The Legend</p>
+          <p className="text-sm uppercase tracking-wider text-[var(--accent-gold)]">The Legend</p>
           <h2 className="mt-2 text-3xl font-bold md:text-5xl">From desert myth to modern ritual</h2>
-          <p className="mt-4 text-white/80">
+          <p className="mt-4 text-[var(--muted-fg)]">
             Born from a treasure unearthed in a sandstorm, the Eid Palm brings a radiant beam of celebration into your
             space. It’s the centerpiece where families gather, stories glow, and traditions evolve.
           </p>
@@ -228,8 +276,7 @@ function Story() {
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
         >
-          {/* Story teaser video (right column) */}
-          <div className="relative aspect-video w-full overflow-hidden rounded-3xl border border-white/10 bg-neutral-900/60 shadow-lg">
+          <div className="relative aspect-video w-full overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--surface)] shadow-lg">
             <video
               key="/legend-teaser-v2.mp4"
               className="h-full w-full object-cover"
@@ -242,7 +289,7 @@ function Story() {
               preload="auto"
               aria-label="Eid Palm story teaser"
             />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-black/30 via-transparent to-black/20 ring-1 ring-white/10" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-black/30 via-transparent to-black/20 ring-1 ring-[var(--ring)]" />
           </div>
         </motion.div>
       </div>
@@ -250,6 +297,7 @@ function Story() {
   );
 }
 
+/* === Features === */
 function Features() {
   const feats = [
     { icon: <Globe className="h-5 w-5" />, title: "Global-ready", text: "Built for homes & venues across the GCC and beyond." },
@@ -259,26 +307,29 @@ function Features() {
   ];
 
   return (
-    <Section id="features" className="bg-neutral-950 py-24 text-white">
+    <Section id="features" className="bg-[var(--background)] py-24 text-[var(--foreground)]">
       <h2 className="text-3xl font-bold md:text-5xl">Design that celebrates</h2>
-      <p className="mt-3 max-w-2xl text-white/70">
-        Elegant by day, radiant by night. Engineered with safe materials and a timeless silhouette. Make Eid the
-        center of your space — beautifully.
+      <p className="mt-3 max-w-2xl text-[var(--muted-fg)]">
+        Elegant by day, radiant by night. Engineered with safe materials and a timeless silhouette.
+        Make Eid the center of your space — beautifully.
       </p>
+
+      {/* >>> INSERTED VOTING STRIP HERE <<< */}
+      <DesignVotes />
 
       <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-4">
         {feats.map((f, i) => (
           <motion.div
             key={i}
-            className="rounded-3xl border border-white/10 bg-gradient-to-br from-neutral-900 to-neutral-800 p-6"
+            className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6"
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ delay: i * 0.05, duration: 0.5 }}
           >
-            <div className="mb-3 text-amber-400">{f.icon}</div>
+            <div className="mb-3 text-[var(--accent-gold)]">{f.icon}</div>
             <h3 className="font-semibold">{f.title}</h3>
-            <p className="mt-1 text-sm text-white/70">{f.text}</p>
+            <p className="mt-1 text-sm text-[var(--muted-fg)]">{f.text}</p>
           </motion.div>
         ))}
       </div>
@@ -286,9 +337,11 @@ function Features() {
   );
 }
 
+
+/* === Preorder (now uses the same dark theme colors) === */
 function Preorder() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const FORM_ENDPOINT = "https://formspree.io/f/movnalpw"; // TODO: move to NEXT_PUBLIC_FORMSPREE_ENDPOINT
+  const FORM_ENDPOINT = "https://formspree.io/f/movnalpw";
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -315,23 +368,33 @@ function Preorder() {
   }
 
   return (
-    <Section id="preorder" className="relative overflow-hidden bg-white py-24 text-neutral-900">
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_60%_at_60%_40%,rgba(245,158,11,0.15),transparent_60%)]" />
+<Section
+  id="preorder"
+  suppressHydrationWarning
+  className="relative overflow-hidden bg-[var(--background)] py-24 text-[var(--foreground)]"
+>
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_60%_at_60%_40%,rgba(245,158,11,0.10),transparent_60%)]" />
       <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:items-center">
         <div className="md:col-span-7">
           <h2 className="text-3xl font-bold md:text-5xl">Preorder Eid Palm</h2>
-          <p className="mt-3 max-w-prose text-neutral-700">
+          <p className="mt-3 max-w-prose text-[var(--muted-fg)]">
             Be among the first to welcome the Eid Palm into your home. Limited early batch with special Zena set.
           </p>
 
-          {/* The actual form */}
-          <form onSubmit={handleSubmit} className="mt-6 grid gap-3 sm:grid-cols-2 max-w-lg" noValidate>
+          {/* === Form: 2 x 2 fields, then full-width CTA === */}
+          <form onSubmit={handleSubmit} className="mt-6 grid gap-3 sm:grid-cols-2 max-w-xl" noValidate>
             <input
               name="name"
               placeholder="Full name"
               required
               autoComplete="name"
-              className="rounded-xl bg-neutral-100 text-neutral-900 placeholder-neutral-500 px-4 py-3 outline-none border border-neutral-200"
+              className="rounded-xl bg-[var(--surface)]/70 text-[var(--foreground)] placeholder-[color:color-mix(in_oklab,var(--foreground)_55%,transparent)] px-4 py-3 outline-none border border-[var(--border)] focus:ring-2 focus:ring-[var(--accent-gold)]/50"
+            />
+            <input
+              name="country"
+              placeholder="Country"
+              autoComplete="country-name"
+              className="rounded-xl bg-[var(--surface)]/70 text-[var(--foreground)] placeholder-[color:color-mix(in_oklab,var(--foreground)_55%,transparent)] px-4 py-3 outline-none border border-[var(--border)] focus:ring-2 focus:ring-[var(--accent-gold)]/50"
             />
             <input
               name="email"
@@ -339,122 +402,129 @@ function Preorder() {
               placeholder="Email address"
               required
               autoComplete="email"
-              className="rounded-xl bg-neutral-100 text-neutral-900 placeholder-neutral-500 px-4 py-3 outline-none border border-neutral-200"
+              className="rounded-xl bg-[var(--surface)]/70 text-[var(--foreground)] placeholder-[color:color-mix(in_oklab,var(--foreground)_55%,transparent)] px-4 py-3 outline-none border border-[var(--border)] focus:ring-2 focus:ring-[var(--accent-gold)]/50"
             />
-            {/* Honeypot */}
+            <input
+              name="phone"
+              type="tel"
+              inputMode="tel"
+              placeholder="Phone number"
+              autoComplete="tel"
+              className="rounded-xl bg-[var(--surface)]/70 text-[var(--foreground)] placeholder-[color:color-mix(in_oklab,var(--foreground)_55%,transparent)] px-4 py-3 outline-none border border-[var(--border)] focus:ring-2 focus:ring-[var(--accent-gold)]/50"
+            />
+
+            {/* spam honeypot */}
             <input type="text" name="_gotcha" className="hidden" tabIndex={-1} autoComplete="off" />
 
             <button
               type="submit"
               disabled={status === "loading"}
               aria-busy={status === "loading"}
-              className="sm:col-span-2 rounded-xl px-5 py-3 font-medium bg-emerald-500 hover:bg-emerald-600 text-white disabled:opacity-60"
+              className="sm:col-span-2 rounded-xl px-5 py-3 font-medium bg-[var(--accent-gold)] text-black hover:brightness-110 disabled:opacity-60"
             >
-              {status === "loading" ? "Sending..." : "Reserve my spot"}
+              {status === "loading" ? "Sending..." : "Reserve now"}
             </button>
 
-            {/* SR-friendly live region for form status */}
             <div aria-live="polite" aria-atomic="true" className="sm:col-span-2 min-h-[1.25rem]">
               {status === "success" && (
-                <p className="text-xs text-emerald-600">Thanks! We’ll email you when preorders open.</p>
+                <p className="text-xs text-emerald-400">Thanks! We’ll email you when preorders open.</p>
               )}
               {status === "error" && (
-                <p className="text-xs text-red-600">Sorry—something went wrong. Please try again.</p>
+                <p className="text-xs text-red-400">Sorry—something went wrong. Please try again.</p>
               )}
             </div>
 
-            <p className="text-xs text-neutral-500 sm:col-span-2">
+            <p className="text-xs text-[var(--muted-fg)] sm:col-span-2">
               We’ll only use your email to notify you about preorder availability.
             </p>
           </form>
 
           <a
             href="#features"
-            className="mt-4 inline-block rounded-2xl px-5 py-3 text-neutral-700 ring-1 ring-neutral-300 hover:bg-neutral-50"
+            className="mt-4 inline-block rounded-2xl px-5 py-3 text-[var(--muted-fg)] ring-1 ring-[var(--border)] hover:bg-[var(--surface)]"
           >
             Learn more
           </a>
         </div>
 
         <div className="md:col-span-5">
-          <div className="aspect-[4/3] w-full rounded-3xl border border-neutral-200 bg-gradient-to-br from-neutral-100 to-neutral-200" />
+          <div className="aspect-[4/3] w-full rounded-3xl border border-[var(--border)] bg-[var(--surface)]" />
         </div>
       </div>
     </Section>
   );
 }
 
+/* ===== Footer (now white background + big logo) ===== */
 function Footer() {
   return (
-    <footer id="contact" className="bg-neutral-950 py-16 text-white">
-      <div className="mx-auto max-w-7xl px-4">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-          <div>
-            <div className="flex items-center gap-2 font-semibold">
-              <img src="/eidpalm-logo-v2.svg" alt="Eid Palm" className="h-5 w-auto" />
-              <span>Eid Palm</span>
-            </div>
-            <p className="mt-3 max-w-sm text-white/70">Culture Element LLC · UAE & GCC</p>
-          </div>
-          <div>
-            <h4 className="mb-2 font-semibold">Get in touch</h4>
-            <ul className="space-y-1 text-white/80">
-              <li>
-                <a className="hover:text-white" href="mailto:halla@eidpalm.com">
-                  halla@eidpalm.com
-                </a>
-              </li>
-              <li>
-                <a className="hover:text-white" href="tel:+971555166112">
-                  +971 55 516 6112
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="mb-2 font-semibold">Links</h4>
-            <ul className="space-y-1 text-white/80">
-              <li>
-                <a className="hover:text-white" href="#story">
-                  Story
-                </a>
-              </li>
-              <li>
-                <a className="hover:text-white" href="#showcase">
-                  Showcase
-                </a>
-              </li>
-              <li>
-                <a className="hover:text-white" href="#preorder">
-                  Preorder
-                </a>
-              </li>
-            </ul>
+    <footer id="contact" className="bg-white text-neutral-900 border-t border-neutral-200">
+      <div className="mx-auto max-w-7xl px-4 py-8 lg:py-10 grid grid-cols-1 gap-6 md:grid-cols-3 items-center">
+        {/* Brand: large logo */}
+        <div className="flex items-center">
+          <img
+            src="/eidpalm-logo-v2.svg"
+            alt="Eid Palm logo"
+            className="h-24 md:h-32 lg:h-40 w-auto select-none"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+
+        {/* Contact */}
+        <div className="md:justify-self-center">
+          <h3 className="font-semibold mb-2">Get in touch</h3>
+          <div className="space-y-1 text-sm">
+            <a href="mailto:halla@eidpalm.com" className="hover:underline">
+              halla@eidpalm.com
+            </a>
+            <div>+971 55 516 6112</div>
           </div>
         </div>
-        <div className="mt-10 flex items-center justify-between border-t border-white/10 pt-6 text-sm text-white/60">
-          <p>© {new Date().getFullYear()} Culture Element LLC</p>
-          <div className="flex items-center gap-4">
-            <a className="hover:text-white" href="#">
-              Privacy
+
+        {/* Links + Social */}
+        <div className="md:justify-self-end">
+          <h3 className="font-semibold mb-2">Links</h3>
+          <ul className="space-y-1 text-sm">
+            <li><a href="#story" className="hover:underline">Story</a></li>
+            <li><a href="#showcase" className="hover:underline">Showcase</a></li>
+            <li><a href="#preorder" className="hover:underline">Preorder</a></li>
+          </ul>
+
+          <div className="mt-3 flex items-center gap-3 text-neutral-600">
+            <a href="https://instagram.com/eidpalm" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:text-neutral-900">
+              <Instagram className="h-5 w-5" />
             </a>
-            <a className="hover:text-white" href="#">
-              Terms
+            <a href="https://www.linkedin.com/company/eidpalm" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="hover:text-neutral-900">
+              <Linkedin className="h-5 w-5" />
+            </a>
+            <a href="https://facebook.com/eidpalm" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="hover:text-neutral-900">
+              <Facebook className="h-5 w-5" />
+            </a>
+            <a href="https://x.com/eidpalm" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)" className="hover:text-neutral-900">
+              <Twitter className="h-5 w-5" />
             </a>
           </div>
+        </div>
+      </div>
+
+      <div className="border-t border-neutral-200">
+        <div className="mx-auto max-w-7xl px-4 py-3 text-xs text-neutral-600">
+          © {new Date().getFullYear()} Culture Element LLC
         </div>
       </div>
     </footer>
   );
 }
 
+/* === Page === */
 export default function EidPalmLanding() {
   return (
-    <main className="bg-neutral-950 text-white selection:bg-amber-300/40 selection:text-white">
+    <main className="bg-[var(--background)] text-[var(--foreground)] selection:bg-[var(--accent-gold)]/40 selection:text-[var(--foreground)]">
       <Grain />
       <Header />
 
-      {/* === HERO (teaser-v2 video + text overlay) === */}
+      {/* === HERO (removed the preorder button) === */}
       <section
         id="hero"
         className="relative isolate aspect-[16/9] w-full overflow-hidden edge-slant-bottom"
@@ -470,9 +540,11 @@ export default function EidPalmLanding() {
           loop
           playsInline
         />
+
         {/* Readability gradient over video */}
         <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-tr from-black/70 via-black/25 to-transparent" />
-        {/* Text overlay */}
+
+        {/* Text overlay (no CTA) */}
         <div className="relative z-20 mx-auto max-w-screen-xl px-4 sm:px-6 md:px-8 py-12 sm:py-20">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold leading-tight tracking-tight">
             Unforgettable Moments &amp; More

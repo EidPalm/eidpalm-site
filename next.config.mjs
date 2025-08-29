@@ -3,6 +3,15 @@ const nextConfig = {
   // Don’t let ESLint block builds while we polish
   eslint: { ignoreDuringBuilds: true },
 
+  // Allow opening the dev site from your LAN IP (removes that warning)
+  // Put your actual LAN IP here; keep localhost too.
+  allowedDevOrigins: [
+    'http://localhost:3000',
+    'http://192.168.1.84:3000',
+    // Or allow your whole 192.168.1.* subnet on port 3000:
+    // /^http:\/\/192\.168\.1\.\d+:3000$/
+  ],
+
   // Cache static assets aggressively in production (bump filenames when updating)
   async headers() {
     return [

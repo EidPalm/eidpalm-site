@@ -1,13 +1,50 @@
 @import "tailwindcss";
+
+/* Utility: centered container */
 @layer utilities {
   .container { margin-inline: auto; padding-inline: 1rem; max-width: 1200px; }
 }
 
+/* === Eid Palm — Emerald Night & Gold (Festive Tuned) ===
+   Base Pantones from Option B, with contrast + glow tweaks.
+---------------------------------------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+
+  /* Core palette */
+  --background: #0E2A22;          /* Pantone 5535 C — deep emerald-night */
+  --foreground: #F4F0DF;          /* Pantone 7499 C — warm ivory */
+  --muted-fg: #BFB79A;            /* Pantone 7498 C — soft warm neutral */
+  --muted-foreground: var(--muted-fg);
+
+  /* Accents (slightly brighter gold for more “Eid”) */
+  --accent-gold: #F0B323;         /* brighter festive gold (Pantone 124 C close) */
+  --accent-gold-600: #D59B1C;     /* deeper hover */
+  --accent-gold-300: #F6CF6E;     /* soft glow */
+  --accent-emerald: #007A5E;      /* Pantone 7724 C */
+  --accent-emerald-ink: #064E3B;
+
+  /* Canonical tokens used in TSX */
+  --accent: var(--accent-gold);
+  --accent-600: var(--accent-gold-600);
+  --link: var(--accent);
+
+  /* Surfaces & effects (slightly stronger lift) */
+  --surface: #0F4735;             /* Pantone 553 C — raised section bg */
+  --card-bg: rgba(255, 255, 255, 0.08);
+  --glass: rgba(244, 240, 223, 0.10); /* ivory-tinted glass */
+
+  /* UI chrome (clearer definition) */
+  --border: rgba(140, 167, 154, 0.28); /* stronger than 0.22 */
+  --ring: rgba(240, 179, 35, 0.50);    /* gold focus ring */
+
+  /* Section-specific (more band contrast) */
+  --panel: #1A5E4E;               /* lighter → clearer Preorder band */
+  --footer-bg: #082F27;           /* deeper base for footer */
+  --input-bg: #1F6A58;            /* inputs slightly lighter than panel */
 }
 
+/* Tailwind v4 token mapping */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -15,15 +52,113 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Keep dark scheme stable */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0E2A22;
+    --foreground: #F4F0DF;
   }
 }
 
+/* Base */
+html, body { background: var(--background); color: var(--foreground); }
 body {
-  background: var(--background);
-  color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Links */
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--accent-600); }
+a:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; border-radius: 6px; }
+
+/* Selection */
+::selection {
+  background: color-mix(in oklab, var(--accent-gold-300) 65%, transparent);
+  color: var(--background);
+}
+
+/* Form defaults */
+input, textarea, select, button { font: inherit; color: var(--foreground); }
+input, textarea, select {
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  accent-color: var(--accent);
+}
+input::placeholder, textarea::placeholder {
+  color: color-mix(in oklab, var(--muted-fg) 82%, transparent);
+  opacity: 0.85;
+}
+:is(input, textarea, select, button):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Cards/Glass helpers */
+.ep-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 1rem; backdrop-filter: blur(8px); }
+.ep-glass { background: var(--glass); backdrop-filter: blur(10px); border-radius: 1rem; }
+
+/* Subtle gold section separators for clearer definition */
+main > section { position: relative; }
+main > section + section::before {
+  content: "";
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-gold-300), transparent);
+  opacity: 0.45;
+}
+
+/* === Festive lifts (no JSX changes) === */
+main h2 {
+  text-shadow:
+    0 0 0.5px color-mix(in oklab, var(--accent-gold) 60%, transparent),
+    0 0 8px color-mix(in oklab, var(--accent-gold-300) 35%, transparent);
+}
+button {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--accent-gold) 35%, transparent) inset,
+    0 6px 24px -8px color-mix(in oklab, var(--accent-gold) 50%, transparent);
+}
+button:hover {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--accent-gold) 55%, transparent) inset,
+    0 10px 30px -10px color-mix(in oklab, var(--accent-gold) 65%, transparent);
+}
+
+/* === Header nav colours === */
+/* Default ivory links in the header nav; gold on hover */
+header nav a { color: var(--foreground) !important; transition: color 180ms ease; }
+header nav a:hover,
+header nav a:focus-visible { color: var(--accent) !important; }
+
+/* Keep the Preorder link in the nav gold by default (invert on hover) */
+header nav a[href*="preorder"] { color: var(--accent) !important; }
+header nav a[href*="preorder"]:hover,
+header nav a[href*="preorder"]:focus-visible,
+header nav a[href*="preorder"]:active { color: var(--foreground) !important; }
+
+/* === Hide only the SECOND Preorder inside the same menu (ul>li>a pattern) === */
+header nav li:has(> a[href*="preorder"]) ~ li:has(> a[href*="preorder"]) {
+  display: none !important;
+}
+
+/* If your menu isn't using <li>, but plain anchors as siblings, also handle that case */
+header nav a[href*="preorder"] + a[href*="preorder"],
+header nav a[href*="preorder"] ~ a[href*="preorder"] {
+  display: none !important;
+}
+
+/* === Marquee hover → gold === */
+.ep-marquee .ep-marquee-item {
+  color: color-mix(in oklab, var(--foreground) 90%, transparent);
+  transition: color 180ms ease, transform 180ms ease;
+}
+.ep-marquee .ep-marquee-item:hover { color: var(--accent); transform: translateY(-1px); }
+
+/* === Gold gradient divider utility === */
+.ep-divider {
+  height: 1px; width: 100%;
+  background: linear-gradient(90deg, transparent, var(--accent-gold-300), transparent);
+  opacity: 0.65;
 }

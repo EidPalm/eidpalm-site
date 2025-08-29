@@ -1,0 +1,136 @@
+@import "tailwindcss";
+
+/* Utility: centered container */
+@layer utilities {
+  .container { margin-inline: auto; padding-inline: 1rem; max-width: 1200px; }
+}
+
+/* === Eid Palm — Emerald Night & Gold (Pantone-matched) ===
+   Background: 5535 C  (#0E2A22)
+   Foreground: 7499 C  (#F4F0DF)
+   Muted:      7498 C  (#BFB79A)
+   Gold:       7409 C  (#E0AA0F), hover 7555 C (#C69214), soft 7403 C (#F2C66D)
+   Emerald:    7724 C  (#007A5E)
+   Surfaces:   553 C   (#0F4735), Panel 554 C (#155244), Inputs 555 C (#1C5B4C)
+   Footer:     626 C   (#0B362D)
+---------------------------------------------------------------- */
+:root {
+  color-scheme: dark;
+
+  /* Core palette */
+  --background: #0E2A22;          /* Pantone 5535 C — deep emerald-night */
+  --foreground: #F4F0DF;          /* Pantone 7499 C — warm ivory */
+  --muted-fg: #BFB79A;            /* Pantone 7498 C — soft warm neutral */
+  --muted-foreground: var(--muted-fg); /* back-compat alias */
+
+  /* Accents */
+  --accent-gold: #E0AA0F;         /* Pantone 7409 C */
+  --accent-gold-600: #C69214;     /* Pantone 7555 C */
+  --accent-gold-300: #F2C66D;     /* Pantone 7403 C (soft glow) */
+  --accent-emerald: #007A5E;      /* Pantone 7724 C */
+  --accent-emerald-ink: #064E3B;  /* deep emerald ink (for rare light contexts) */
+
+  /* Canonical tokens used in TSX */
+  --accent: var(--accent-gold);   /* CTAs/links default to festive gold */
+  --accent-600: var(--accent-gold-600);
+  --link: var(--accent);
+
+  /* Surfaces & effects */
+  --surface: #0F4735;             /* Pantone 553 C — raised section bg */
+  --card-bg: rgba(255, 255, 255, 0.06);
+  --glass: rgba(244, 240, 223, 0.08); /* ivory-tinted glass */
+
+  /* UI chrome */
+  /* Border color based on Pantone 5615 C (#8CA79A) @ ~22% alpha */
+  --border: rgba(140, 167, 154, 0.22);
+  /* Focus ring in gold (7409 C) @ ~45% alpha */
+  --ring: rgba(224, 170, 15, 0.45);
+
+  /* Section-specific */
+  --panel: #155244;               /* Pantone 554 C — Preorder panel (lighter than bg) */
+  --footer-bg: #0B362D;           /* Pantone 626 C — deeper base for footer */
+  --input-bg: #1C5B4C;            /* Pantone 555 C — inputs slightly lighter than panel */
+}
+
+/* Tailwind v4 token mapping */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* Keep dark scheme stable */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0E2A22;
+    --foreground: #F4F0DF;
+  }
+}
+
+/* Base */
+html, body {
+  background: var(--background);
+  color: var(--foreground);
+}
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Links */
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--accent-600); }
+a:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Selection */
+::selection {
+  background: color-mix(in oklab, var(--accent-gold-300) 60%, transparent);
+  color: var(--background);
+}
+
+/* Form defaults (override per-component as needed) */
+input, textarea, select, button { font: inherit; color: var(--foreground); }
+input, textarea, select {
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  accent-color: var(--accent);
+}
+input::placeholder, textarea::placeholder {
+  color: color-mix(in oklab, var(--muted-fg) 82%, transparent);
+  opacity: 0.8;
+}
+:is(input, textarea, select, button):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Cards/Glass helpers */
+.ep-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  backdrop-filter: blur(6px);
+}
+.ep-glass {
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+  border-radius: 1rem;
+}
+
+/* Subtle gold section separators for clearer definition (can remove if undesired) */
+main > section { position: relative; }
+main > section + section::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-gold-300), transparent);
+  opacity: 0.35;
+}

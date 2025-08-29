@@ -47,7 +47,7 @@ export default function VideoCard({
     <motion.figure
       role="group"
       aria-label={title || "Video"}
-      className={`relative overflow-hidden rounded-3xl border border-white/10 bg-neutral-900 ${className}`}
+      className={`relative overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--card-bg)] ${className}`}
       initial={{ opacity: 0, y: 14 }}
       whileInView={{
         opacity: 1,
@@ -74,9 +74,17 @@ export default function VideoCard({
       />
       {(title || caption) && (
         <figcaption className="pointer-events-none absolute inset-x-0 bottom-0 p-3 sm:p-4">
-          <div className="rounded-xl bg-black/35 px-3 py-2 backdrop-blur">
-            {title && <h3 className="text-sm font-medium">{title}</h3>}
-            {caption && <p className="mt-0.5 text-xs text-white/80">{caption}</p>}
+          <div className="rounded-xl bg-[var(--glass)] px-3 py-2 backdrop-blur-sm">
+            {title && (
+              <h3 className="text-sm font-medium text-[var(--foreground)]">
+                {title}
+              </h3>
+            )}
+            {caption && (
+              <p className="mt-0.5 text-xs text-[var(--muted-fg)]">
+                {caption}
+              </p>
+            )}
           </div>
         </figcaption>
       )}

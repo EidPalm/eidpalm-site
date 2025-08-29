@@ -1,0 +1,132 @@
+@import "tailwindcss";
+
+/* Utility: centered container */
+@layer utilities {
+  .container { margin-inline: auto; padding-inline: 1rem; max-width: 1200px; }
+}
+
+/* === Eid Palm — Festive Night v2 (gold-forward, higher contrast) === */
+:root {
+  color-scheme: dark;
+
+  /* Core palette (slightly deeper bg, brighter fg) */
+  --background: #08130F;           /* deeper teal-black */
+  --foreground: #F2FBF7;           /* bright mint/ivory */
+  --muted-fg: #BFE7DA;             /* softer secondary text */
+  --muted-foreground: var(--muted-fg); /* back-compat alias */
+
+  /* Accents */
+  --accent-gold: #F6C148;          /* festive gold (primary) */
+  --accent-gold-deep: #DFA233;     /* hover/600 */
+  --accent-gold-soft: #FCD34D;     /* glow/light gold */
+  --accent-emerald: #10B981;       /* emerald-500 (secondary) */
+  --accent-emerald-ink: #064E3B;   /* deep emerald for inks */
+  --accent-teal: #06B6D4;          /* cyan-500 (sparingly) */
+  --accent-plum: #7C3AED;          /* violet-600 (sparingly) */
+
+  /* Canonical tokens used in TSX */
+  --accent: var(--accent-gold);    /* CTA/buttons now gold */
+  --accent-600: var(--accent-gold-deep);
+  --accent-gold-300: var(--accent-gold-soft);
+  --link: var(--accent);           /* links inherit festive gold */
+
+  /* Surfaces (more separation between sections/cards) */
+  --surface: #12231E;              /* raised section bg (subtle) */
+  --card-bg: rgba(255, 255, 255, 0.06);  /* stronger than before */
+  --glass: rgba(233, 247, 242, 0.08);
+
+  /* UI chrome (stronger borders/rings for clarity) */
+  --border: rgba(233, 247, 242, 0.20);
+  --ring: rgba(246, 193, 72, 0.45);     /* gold focus ring */
+
+  /* Panels & Footer (clear contrast) */
+  --panel: #12362B;                /* Preorder panel — a touch lighter */
+  --footer-bg: #06140F;            /* Footer strip — a touch darker */
+  --input-bg: #14362C;             /* Inputs slightly brighter than panel */
+
+  /* Helpers for dividers */
+  --gold-40: #FCD34D66;            /* gold @ 40% */
+  --gold-25: #FCD34D40;            /* gold @ 25% */
+}
+
+/* Map custom props to Tailwind design tokens (Tailwind v4) */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* Keep dark scheme consistent */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #08130F;
+    --foreground: #F2FBF7;
+  }
+}
+
+/* Base */
+html, body {
+  background: var(--background);
+  color: var(--foreground);
+}
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Links */
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--accent-600); }
+a:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Selection */
+::selection {
+  background: rgba(252, 211, 77, 0.35);
+  color: var(--background);
+}
+
+/* Form defaults */
+input, textarea, select, button { font: inherit; color: var(--foreground); }
+input, textarea, select {
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  accent-color: var(--accent);
+}
+input::placeholder, textarea::placeholder {
+  color: color-mix(in oklab, var(--muted-fg) 80%, transparent);
+  opacity: 0.75;
+}
+:is(input, textarea, select, button):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Cards/Glass helpers */
+.ep-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  backdrop-filter: blur(6px);
+}
+.ep-glass {
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+  border-radius: 1rem;
+}
+
+/* === Section separation: elegant festive dividers (no JSX changes needed) === */
+main > section { position: relative; }
+main > section + section::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-40), transparent);
+}

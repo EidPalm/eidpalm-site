@@ -3,31 +3,31 @@ import React from "react";
 
 type MarqueeProps = {
   items: string[];
+  speed?: number;        // seconds per loop
+  className?: string;
 };
 
-export default function Marquee({ items }: MarqueeProps) {
+export default function Marquee({ items, speed = 14, className = "" }: MarqueeProps) {
+  const loop = [...items, ...items, ...items]; // seamless
+
   return (
-    <div className="relative overflow-hidden border-y border-white/10 bg-neutral-950">
-      <div className="marquee whitespace-nowrap py-3 text-sm text-white/70">
-        {items.concat(items).map((w, i) => (
-          <span key={i} className="mx-6 inline-block">
-            {w}
+    <div
+      className={`ep-marquee overflow-hidden border-t border-[var(--border)]/40 bg-[var(--surface)] ${className}`}
+      data-role="marquee"
+    >
+      <div className="ep-track whitespace-nowrap flex gap-8 py-3">
+        {loop.map((txt, i) => (
+          <span key={i} className="ep-marquee-item uppercase tracking-wide text-sm md:text-base">
+            {txt}
           </span>
         ))}
       </div>
+
       <style jsx>{`
-        .marquee {
-          display: inline-block;
-          animation: marquee 18s linear infinite;
-          will-change: transform;
-        }
+        .ep-track { animation: marquee var(--speed, ${speed}s) linear infinite; }
         @keyframes marquee {
-          0% {
-            transform: translateX(0%);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
         }
       `}</style>
     </div>
